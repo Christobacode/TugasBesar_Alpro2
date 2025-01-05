@@ -1,38 +1,41 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"strings"
+)
 
 // Struktur Data
 type SparePart struct {
-	Nama  string
-	Harga int
-	Stock int
+	Nama    string
+	Harga   int
+	Stock   int
+	terjual int
 }
 
 type Transaksi struct {
 	NamaPelanggan string
 	Waktu         string
-	SpareParts    []SparePart 
+	SpareParts    [10]SparePart
 	JumlahBeli    int
 	BiayaService  int
 	Total         int
 }
 
-var spareParts []SparePart = []SparePart{
-	{"Kampas Rem", 30000, 10},
-	{"Aki", 200000, 5},
-	{"Busi", 15000, 20},
-	{"Oli Mesin", 45000, 10},
-	{"Filter Udara", 40000, 7},
-	{"Bearing Roda", 40000, 12},
-	{"Shockbreaker", 200000, 6},
-	{"Kampas Kopling", 125000, 4},
-	{"Piston", 200000, 5},
-	{"Stator", 200000, 6},
-	
+var spareParts [11]SparePart = [11]SparePart{
+	{"KampasRem", 30000, 10, 3},
+	{"Aki", 200000, 5, 4},
+	{"Busi", 15000, 20, 10},
+	{"OliMesin", 45000, 10, 7},
+	{"FilterUdara", 40000, 7, 2},
+	{"BearingRoda", 40000, 12, 3},
+	{"Shockbreaker", 200000, 6, 2},
+	{"KampasKopling", 125000, 4, 5},
+	{"Piston", 200000, 5, 2},
+	{"Stator", 200000, 6, 1},
 }
 
-var transaksiList []Transaksi
+var transaksiList [15]Transaksi
 var jumlahTransaksi int = 0
 
 // Fungsi Login
@@ -54,12 +57,14 @@ func login() string {
 // Menu Admin
 func menuAdmin() {
 	for {
-		fmt.Println("\nMenu Admin:")
+		fmt.Println("==============================================================")
+		fmt.Println("=                        Menu Admin                          =")
+		fmt.Println("==============================================================")
 		fmt.Println("1. Tambahkan Spare-part")
 		fmt.Println("2. Ubah Spare-part")
 		fmt.Println("3. Hapus Spare-part")
 		fmt.Println("4. Daftar Spare-part")
-		fmt.Println("5. Keluar")
+		fmt.Println("5. Kembali ke menu login")
 		var choice int
 		fmt.Print("Pilih menu: ")
 		fmt.Scan(&choice)
@@ -96,11 +101,13 @@ func menuAdmin() {
 // Menu Pengguna
 func menuPengguna() {
 	for {
-		fmt.Println("\nMenu Pengguna:")
+		fmt.Println("==============================================================")
+		fmt.Println("=                       Menu Pengguna                        =")
+		fmt.Println("==============================================================")
 		fmt.Println("1. Transaksi")
 		fmt.Println("2. Pencarian Pelanggan")
 		fmt.Println("3. Daftar Spare-part Terurut")
-		fmt.Println("4. Keluar")
+		fmt.Println("4. Kembali ke menu login")
 		var choice int
 		fmt.Print("Pilih menu: ")
 		fmt.Scan(&choice)
@@ -129,30 +136,36 @@ func menuPengguna() {
 	}
 }
 
-// Fungsi Admin
+// tambah sparepart
 func tambahkanSparePart() {
 	var nama string
-	var harga, stock int
+	var harga, stock, terjual int
 	fmt.Print("Nama Spare-part: ")
 	fmt.Scan(&nama)
 	fmt.Print("Harga: ")
 	fmt.Scan(&harga)
 	fmt.Print("Stok: ")
 	fmt.Scan(&stock)
-
-	spareParts = append(spareParts, SparePart{nama, harga, stock})
-
-	fmt.Println("Spare-part berhasil ditambahkan.")
+	fmt.Print("terjual: ")
+	fmt.Scan(&terjual)
+	for i := 0; i < len(spareParts); i++ {
+		if spareParts[i].Nama == "" {
+			spareParts[i] = SparePart{nama, harga, stock, terjual}
+			fmt.Println("Spare-part berhasil ditambahkan.")
+		}
+	}
+	fmt.Println("Array penuh! tidak bisa menambahkan lagi.")
 }
 
+// ubah sparepart
 func ubahSparePart() {
 	var index int
-	fmt.Print("Pilih nomor Spare-part yang ingin diubah (1 - ", len(spareParts), "): ")
+	fmt.Print("Pilih nomor Spare-part yang ingin diubah: ")
 	fmt.Scan(&index)
 
 	if index > 0 && index <= len(spareParts) {
 		var nama string
-		var harga, stock int
+		var harga, stock, terjual int
 		fmt.Print("Nama Baru: ")
 		fmt.Scan(&nama)
 		fmt.Print("Harga Baru: ")
@@ -160,49 +173,127 @@ func ubahSparePart() {
 		fmt.Print("Stok Baru: ")
 		fmt.Scan(&stock)
 
-		spareParts[index-1] = SparePart{nama, harga, stock}
+		spareParts[index-1] = SparePart{nama, harga, stock, terjual}
 		fmt.Println("Spare-part berhasil diubah.")
 	} else {
 		fmt.Println("Indeks tidak valid.")
 	}
 }
 
+// hapus sparepart
 func hapusSparePart() {
 	var index int
-	fmt.Print("Pilih nomor Spare-part yang ingin dihapus (1 - ", len(spareParts), "): ")
+	fmt.Print("Pilih nomor Spare-part yang ingin dihapus : ")
 	fmt.Scan(&index)
 
 	if index > 0 && index <= len(spareParts) {
-		spareParts = append(spareParts[:index-1], spareParts[index:]...) // Menghapus spare-part
+		spareParts[index-1] = SparePart{} // Empty the slot
 		fmt.Println("Spare-part berhasil dihapus.")
 	} else {
 		fmt.Println("Indeks tidak valid.")
 	}
 }
 
+// daftar sparepart
 func daftarSparePart() {
-	fmt.Println("\nDaftar Spare-part:")
 	for i, sp := range spareParts {
-		fmt.Printf("%d. Nama: %s, Harga: Rp%d, Stok: %d\n", i+1, sp.Nama, sp.Harga, sp.Stock)
+		if sp.Nama != "" {
+			fmt.Printf("%d. Nama: %s, Harga: Rp%d, Stok: %d\n", i+1, sp.Nama, sp.Harga, sp.Stock)
+		}
 	}
 }
 
-// Fungsi untuk mencari pelanggan (belum diimplementasikan)
+// Fungsi Pencarian Pelanggan
 func cariPelanggan() {
-	fmt.Println("Fungsi pencarian pelanggan belum diimplementasikan.")
+	for {
+		fmt.Println("\nMenu Pencarian Pelanggan:")
+		fmt.Println("1. Cari pelanggan berdasarkan waktu transaksi")
+		fmt.Println("2. Cari pelanggan berdasarkan spare-part yang dibeli")
+		fmt.Println("3. Kembali ke menu sebelumnya")
+		var pilihan int
+		fmt.Print("Pilih menu: ")
+		fmt.Scan(&pilihan)
+
+		switch pilihan {
+		case 1:
+			cariBerdasarkanWaktu()
+		case 2:
+			cariBerdasarkanSparePart()
+		case 3:
+			return
+		default:
+			fmt.Println("Pilihan tidak valid.")
+		}
+	}
 }
 
-// Fungsi untuk menampilkan daftar spare-part terurut
-func daftarSparePartTerurut() {
-	fmt.Println("\nDaftar Spare-part Terurut:")
-	for i := 0; i < len(spareParts)-1; i++ {
-		for j := 0; j < len(spareParts)-i-1; j++ {
-			if spareParts[j].Harga > spareParts[j+1].Harga {
-				spareParts[j], spareParts[j+1] = spareParts[j+1], spareParts[j]
+// Fungsi Sequential Search berdasarkan waktu transaksi
+func cariBerdasarkanWaktu() {
+	var waktu string
+	fmt.Print("Masukkan waktu transaksi (YYYY-MM-DD): ")
+	fmt.Scan(&waktu)
+
+	ketemu := false
+	fmt.Printf("\nDaftar Pelanggan yang melakukan transaksi pada waktu %s:\n", waktu)
+	for i := 0; i < len(transaksiList); i++ {
+		if transaksiList[i].Waktu == waktu {
+			fmt.Printf("- Nama: %s, Waktu: %s, Total: Rp%d\n", transaksiList[i].NamaPelanggan, transaksiList[i].Waktu, transaksiList[i].Total)
+			ketemu = true
+		}
+	}
+
+	if !ketemu {
+		fmt.Println("Tidak ada transaksi yang ditemukan pada waktu tersebut.")
+	}
+}
+
+// Fungsi Sequential Search berdasarkan spare-part
+func cariBerdasarkanSparePart() {
+	var namaSparePart string
+	fmt.Print("Masukkan nama spare-part: ")
+	fmt.Scan(&namaSparePart)
+
+	ketemu := false
+	totalSparePart := 0
+	fmt.Printf("\nDaftar Pelanggan yang membeli spare-part %s:\n", namaSparePart)
+	for i := 0; i < len(transaksiList); i++ {
+		for j := 0; j < len(transaksiList[i].SpareParts); j++ {
+			if strings.EqualFold(transaksiList[i].SpareParts[j].Nama, namaSparePart) {
+				totalSparePart += transaksiList[i].SpareParts[j].Harga
+				fmt.Printf("- Nama: %s, Waktu: %s, Total Spare-Part: Rp%d, Total Transaksi: Rp%d\n", transaksiList[i].NamaPelanggan,
+					transaksiList[i].Waktu, totalSparePart, transaksiList[i].Total)
+				ketemu = true
+				break
 			}
 		}
 	}
-	daftarSparePart()
+
+	if !ketemu {
+		fmt.Println("Tidak ada transaksi yang ditemukan dengan spare-part tersebut.")
+	}
+}
+
+// daftar data yang diurutkan sesuai penjualan terbanyak
+func daftarSparePartTerurut() {
+	// Menggunakan algoritma Selection Sort untuk mengurutkan spare-part berdasarkan jumlah terjual (terjual) secara menurun (descending)
+	sparePartsTerurut := spareParts
+	var i int
+	var j int
+	var maxIndex int
+	for i = 0; i < len(sparePartsTerurut)-1; i++ {
+		maxIndex = i
+		for j = i + 1; j < len(sparePartsTerurut); j++ {
+			if sparePartsTerurut[j].terjual > sparePartsTerurut[maxIndex].terjual {
+				maxIndex = j
+			}
+		}
+		sparePartsTerurut[i], sparePartsTerurut[maxIndex] = sparePartsTerurut[maxIndex], sparePartsTerurut[i]
+	}
+	for i, sp := range sparePartsTerurut {
+		if sp.Nama != "" {
+			fmt.Printf("%d. Nama: %s, Terjual: %d, Harga: Rp%d, Stok: %d\n", i+1, sp.Nama, sp.terjual, sp.Harga, sp.Stock)
+		}
+	}
 }
 
 // Fungsi untuk melakukan transaksi
@@ -221,12 +312,13 @@ func transaksi() {
 	fmt.Print("Waktu Transaksi: ")
 	fmt.Scan(&waktu)
 
-	var daftarBeli []SparePart
+	var daftarBeli [10]SparePart
+	var indexBeli int = 0
 
 	for {
 		daftarSparePart()
 		fmt.Println("==============================================================")
-		fmt.Print("Pilih Spare-part untuk dibeli (0 untuk selesai): " )
+		fmt.Print("Pilih Spare-part untuk dibeli (0 untuk selesai): ")
 		fmt.Scan(&pilihan)
 		fmt.Println("==============================================================")
 
@@ -236,9 +328,11 @@ func transaksi() {
 
 		if pilihan > 0 && pilihan <= len(spareParts) {
 			if spareParts[pilihan-1].Stock > 0 {
-				daftarBeli = append(daftarBeli, spareParts[pilihan-1])
+				spareParts[pilihan-1].Stock--                 // Kurangi stok
+				spareParts[pilihan-1].terjual++               // Tambah jumlah terjual
+				daftarBeli[indexBeli] = spareParts[pilihan-1] // Masukkan ke transaksi
+				indexBeli++
 				total += spareParts[pilihan-1].Harga
-				spareParts[pilihan-1].Stock-- // Kurangi stok
 			} else {
 				fmt.Println("Stok tidak cukup untuk spare-part ini.")
 			}
@@ -251,18 +345,18 @@ func transaksi() {
 	fmt.Print("Apakah ingin melakukan service? (1 untuk Ya, 0 untuk Tidak): ")
 	fmt.Scan(&pilihan)
 	if pilihan == 1 {
-		biayaService = 15000 * len(daftarBeli)
+		biayaService = 15000 * indexBeli
 		total += biayaService
 	}
 
-	transaksiList = append(transaksiList, Transaksi{
+	transaksiList[jumlahTransaksi] = Transaksi{
 		NamaPelanggan: namaPelanggan,
 		Waktu:         waktu,
 		SpareParts:    daftarBeli,
-		JumlahBeli:    len(daftarBeli),
+		JumlahBeli:    indexBeli,
 		BiayaService:  biayaService,
 		Total:         total,
-	})
+	}
 	jumlahTransaksi++
 
 	fmt.Printf("Total Pembayaran: Rp%d\n", total)
@@ -270,15 +364,44 @@ func transaksi() {
 
 // Fungsi Utama
 func main() {
-	role := login()
-	if role == "" {
-		fmt.Println("Login gagal.")
-		return
-	}
+	for {
+		fmt.Println("==============================================================")
+		fmt.Println("=                         Menu Login                         =")
+		fmt.Println("==============================================================")
+		fmt.Println("1. Admin")
+		fmt.Println("2. Pengguna")
+		fmt.Println("3. Keluar")
+		fmt.Print("Pilih opsi: ")
 
-	if role == "admin" {
-		menuAdmin()
-	} else if role == "pengguna" {
-		menuPengguna()
+		var pilihan int
+		fmt.Scan(&pilihan)
+
+		switch pilihan {
+		case 1:
+			fmt.Println("==============================================================")
+			fmt.Println("=                    Login Sebagai Admin                     =")
+			fmt.Println("==============================================================")
+			role := login()
+			if role == "admin" {
+				menuAdmin()
+			} else {
+				fmt.Println("Login gagal. Username atau password salah.")
+			}
+		case 2:
+			fmt.Println("==============================================================")
+			fmt.Println("=                  Login Sebagai Pengguna                    =")
+			fmt.Println("==============================================================")
+			role := login()
+			if role == "pengguna" {
+				menuPengguna()
+			} else {
+				fmt.Println("Login gagal. Username atau password salah.")
+			}
+		case 3:
+			fmt.Println("\nTerima kasih telah menggunakan sistem ini. Sampai jumpa!")
+			return
+		default:
+			fmt.Println("Pilihan tidak valid. Silakan coba lagi.")
+		}
 	}
 }
