@@ -262,7 +262,7 @@ func cariBerdasarkanSparePart() {
 		for j := 0; j < len(transaksiList[i].SpareParts); j++ {
 			if strings.EqualFold(transaksiList[i].SpareParts[j].Nama, namaSparePart) {
 				totalSparePart += transaksiList[i].SpareParts[j].Harga
-				fmt.Printf("- Nama: %s, Waktu: %s, Total Spare-Part: Rp%d, Total Transaksi: Rp%d\n", transaksiList[i].NamaPelanggan,
+				fmt.Printf("- Nama: %s, Waktu: %s, Harga Spare-Part: Rp%d, Total Transaksi: Rp%d\n", transaksiList[i].NamaPelanggan,
 					transaksiList[i].Waktu, totalSparePart, transaksiList[i].Total)
 				ketemu = true
 				break
@@ -300,7 +300,7 @@ func daftarSparePartTerurut() {
 
 // Fungsi untuk melakukan transaksi
 func transaksi() {
-	if jumlahTransaksi >= 15 {
+	if jumlahTransaksi > 15 {
 		fmt.Println("Kapasitas Transaksi penuh.")
 		return
 	}
@@ -330,9 +330,9 @@ func transaksi() {
 
 		if pilihan > 0 && pilihan <= len(spareParts) {
 			if spareParts[pilihan-1].Stock > 0 {
-				spareParts[pilihan-1].Stock--                 // Kurangi stok
-				spareParts[pilihan-1].terjual++               // Tambah jumlah terjual
-				daftarBeli[indexBeli] = spareParts[pilihan-1] // Masukkan ke transaksi
+				spareParts[pilihan-1].Stock--   // Kurangi stok
+				spareParts[pilihan-1].terjual++ // Tambah jumlah terjual
+				daftarBeli[indexBeli] = spareParts[pilihan-1]
 				indexBeli++
 				total += spareParts[pilihan-1].Harga
 			} else {
