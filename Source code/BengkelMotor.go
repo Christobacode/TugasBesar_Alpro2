@@ -172,6 +172,8 @@ func ubahSparePart() {
 		fmt.Scan(&harga)
 		fmt.Print("Stok Baru: ")
 		fmt.Scan(&stock)
+		fmt.Print("Terjual Baru: ")
+		fmt.Scan(&terjual)
 
 		spareParts[index-1] = SparePart{nama, harga, stock, terjual}
 		fmt.Println("Spare-part berhasil diubah.")
