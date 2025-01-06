@@ -300,7 +300,7 @@ func daftarSparePartTerurut() {
 
 // Fungsi untuk melakukan transaksi
 func transaksi() {
-	if jumlahTransaksi >= 10 {
+	if jumlahTransaksi >= 15 {
 		fmt.Println("Kapasitas Transaksi penuh.")
 		return
 	}
